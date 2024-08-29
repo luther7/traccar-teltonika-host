@@ -1,0 +1,188 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddclient-config
+data:
+  ddclient.conf: |
+    password_env=PASSWORD, \
+    protocol_env=PROTOCOL, \
+    login_env=USER,        \
+    ttl=30,                \
+    usev4=webv4,           \
+    webv4=api.ipify.org,   \
+    zone_env=ZONE,         \
+    host_env=HOST
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 12Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tailscale-data
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traccar
+  annotations:
+    io.podman.annotations.init.container.type: "always"
+spec:
+  containers:
+  - name: traccar
+    image: docker.io/traccar/traccar:6.4-alpine
+    ports:
+    - containerPort: 5052
+      hostPort: 5052
+    env:
+    - name: DEFAULT_JVM_OPTS
+      value: -Xmx256m -Xms256m
+    - name: CONFIG_USE_ENVIRONMENT_VARIABLES
+      value: "true"
+    - name: LOGGER_CONSOLE
+      value: "true"
+    - name: DATABASE_DRIVER
+      value: "com.mysql.cj.jdbc.Driver"
+    - name: DATABASE_USER
+      value: traccar
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysql-passwords
+          key: traccar
+    - name: DATABASE_URL
+      value: jdbc:mysql://mysql/traccar
+  - name: mysql
+    image: docker.io/library/mysql:9.0
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysql-passwords
+          key: root
+    - name: MYSQL_USER
+      value: traccar
+    - name: MYSQL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysql-passwords
+          key: traccar
+    - name: MYSQL_DATABASE
+      value: traccar
+    volumeMounts:
+    - name: mysql-data
+      mountPath: /var/lib/mysql
+  - name: tailscale
+    image: docker.io/tailscale/tailscale:v1.72
+    env:
+    - name: TS_HOSTNAME
+      value: traccar
+    - name: TS_STATE_DIR
+      value: /var/lib/tailscale
+    - name: TS_AUTHKEY
+      valueFrom:
+        secretKeyRef:
+          name: tailscale
+          key: auth-key
+    - name: TS_EXTRA_ARGS
+      value: --advertise-tags=tag:infrastructure
+    - name: TS_SERVE_CONFIG
+      value: /config/serve.json
+    volumeMounts:
+    - name: tailscale-config
+      mountPath: /config
+    - name: tailscale-data
+      mountPath: /var/lib/tailscale
+  - name: ddclient
+    image: docker.io/linuxserver/ddclient:3.11.2
+    env:
+    - name: PROTOCOL
+      valueFrom:
+        secretKeyRef:
+          name: ddclient
+          key: protocol
+    - name: PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: ddclient
+          key: password
+    - name: USER
+      valueFrom:
+        secretKeyRef:
+          name: ddclient
+          key: user
+    - name: ZONE
+      valueFrom:
+        secretKeyRef:
+          name: ddclient
+          key: zone
+    - name: HOST
+      valueFrom:
+        secretKeyRef:
+          name: ddclient
+          key: host
+    volumeMounts:
+    - name: ddclient-config
+      mountPath: /ddclient-config
+  initContainers:
+  - name: init-tailscale-serve-config
+    image: docker.io/library/busybox:1.36
+    command:
+      - sh
+      - -c
+      - |
+        cat <<EOF > /config/serve.json
+        {
+          "TCP": {
+            "443": {
+              "HTTPS": true
+            }
+          },
+          "Web": {
+            "traccar.$DOMAIN.ts.net:443": {
+              "Handlers": {
+                "/": {
+                  "Proxy": "http://traccar:8082"
+                }
+              }
+            }
+          }
+        }
+        EOF
+    env:
+    - name: DOMAIN
+      valueFrom:
+        secretKeyRef:
+          name: tailscale
+          key: domain
+    volumeMounts:
+    - name: tailscale-config
+      mountPath: /config
+  volumes:
+  - name: tailscale-config
+    emptydir: {}
+  - name: ddclient-config
+    configMap:
+      name: ddclient-config
+  - name: mysql-data
+    persistentVolumeClaim:
+      claimName: mysql-data
+  - name: tailscale-data
+    persistentVolumeClaim:
+      claimName: tailscale-data
