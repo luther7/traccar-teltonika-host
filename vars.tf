@@ -1,20 +1,12 @@
-variable "dns_zone" {
-  type = string
-}
-
-variable "dns_subdomain" {
-  type = string
-}
-
 variable "ssh_key_name" {
   type = string
 }
 
-variable "tailscale_tags" {
-  type = list(string)
+variable "cert_common_name" {
+  type = string
 }
 
-variable "cloudflare_api_token" {
+variable "tailscale_authkey" {
   type      = string
   sensitive = true
 }

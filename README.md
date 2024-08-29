@@ -1,8 +1,5 @@
 # Traccar server
 
 ## TODO
-- Certificate and NGINX proxy for mTLS.
-- Replace MySQL with SQLite.
-- Containerise.
-- Deploy with remote podman.
+- Offload TLS with stunnel for Teltonika port.
 - Complete read-me.

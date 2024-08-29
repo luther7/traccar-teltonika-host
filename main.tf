@@ -1,15 +1,18 @@
-resource "random_password" "mysql_password" {
-  length     = 32
-  special = true
+resource "tls_private_key" "mtls_private_key" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P384"
 }
 
-resource "tailscale_tailnet_key" "traccar_key" {
-  reusable      = true
-  ephemeral     = false
-  preauthorized = true
-  expiry        = 3600
-  description   = "Traccar key"
-  tags          = var.tailscale_tags
+resource "tls_self_signed_cert" "mtls_cert" {
+  private_key_pem       = tls_private_key.mtls_private_key.private_key_pem
+  validity_period_hours = 87600
+  dns_names             = [var.cert_common_name]
+  allowed_uses          = ["client_auth"]
+}
+
+resource "local_file" "ca_cert" {
+  content  = tls_self_signed_cert.mtls_cert.cert_pem
+  filename = "out/cert.pem"
 }
 
 resource "aws_security_group" "traccar_security_group" {
@@ -41,25 +44,10 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv6" {
   ip_protocol       = "-1"
 }
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"] # Canonical
-}
-
 resource "aws_instance" "traccar_instance" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = "t3a.micro"
+  # Ubuntu 24.04 arm64 ap-southeast-2
+  ami                         = "ami-0e86a390303d8b431"
+  instance_type               = "t4g.small"
   security_groups             = [aws_security_group.traccar_security_group.name]
   associate_public_ip_address = true
   key_name                    = var.ssh_key_name
@@ -68,16 +56,12 @@ resource "aws_instance" "traccar_instance" {
   user_data = templatefile(
     "${path.module}/setup.bash",
     {
-      mysql_password       = random_password.mysql_password.result
-      cloudflare_api_token = var.cloudflare_api_token
-      tailscale_auth_key   = tailscale_tailnet_key.traccar_key.key
-      dns_zone             = var.dns_zone
-      dns_subdomain        = var.dns_subdomain
+      tailscale_authkey = var.tailscale_authkey
     }
   )
 
   root_block_device {
-    encrypted = true
+    encrypted   = true
     volume_size = 30
   }
 

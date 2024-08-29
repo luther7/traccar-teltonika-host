@@ -23,7 +23,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 12Gi
+      storage: 20Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -35,7 +35,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
 ---
 apiVersion: v1
 kind: Pod
@@ -67,7 +67,7 @@ spec:
           name: mysql-passwords
           key: traccar
     - name: DATABASE_URL
-      value: jdbc:mysql://mysql/traccar
+      value: jdbc:mysql://traccar-mysql/traccar
   - name: mysql
     image: docker.io/library/mysql:9.0
     env:
