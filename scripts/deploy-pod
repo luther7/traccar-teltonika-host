@@ -4,7 +4,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 # https://github.com/tailscale/tailscale/issues/12409
 traccar_host_ip=$( \
-  ssh ubuntu@traccar-host.himalayan-tortoise.ts.net \
+  ssh ubuntu@traccar-host \
   curl --silent api.ipify.org \
 )
 podman system connection remove traccar

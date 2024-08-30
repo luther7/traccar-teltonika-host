@@ -10,7 +10,12 @@ resource "tls_self_signed_cert" "teltonika_mtls_cert" {
   allowed_uses          = ["client_auth"]
 }
 
-resource "local_file" "teltonika_ca_cert" {
+resource "local_file" "teltonika_mtls_private_key" {
+  content  = tls_private_key.teltonika_mtls_private_key.private_key_pem
+  filename = "stunnel/cert/key.pem"
+}
+
+resource "local_file" "teltonika_mtls_cert" {
   content  = tls_self_signed_cert.teltonika_mtls_cert.cert_pem
-  filename = "out/cert.pem"
+  filename = "stunnel/cert/cert.pem"
 }
