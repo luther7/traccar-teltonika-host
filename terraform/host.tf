@@ -61,7 +61,7 @@ resource "aws_instance" "traccar_host_instance" {
   security_groups             = [aws_security_group.traccar_host_security_group.name]
   key_name                    = var.ssh_key_name
   associate_public_ip_address = true
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
 
   user_data = templatefile(
     "${path.module}/setup-host.bash",

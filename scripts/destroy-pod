@@ -3,5 +3,5 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 ./scripts/create-podman-connection
-podman --connection=traccar kube down "${PODMAN_SECRETS_FILE}"
-podman --connection=traccar kube down pod.yaml
+podman --connection=traccar kube down "k8s/${PODMAN_SECRETS_FILE}"
+podman --connection=traccar kube down k8s/pod.yaml

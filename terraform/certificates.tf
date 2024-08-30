@@ -7,12 +7,6 @@ resource "tls_private_key" "ca_private_key" {
   ecdsa_curve = "P384"
 }
 
-resource "local_file" "ca_key" {
-  content         = tls_private_key.ca_private_key.private_key_pem
-  filename        = "${path.module}/certificates/key.pem"
-  file_permission = "0666"
-}
-
 resource "tls_self_signed_cert" "ca_cert" {
   private_key_pem       = tls_private_key.ca_private_key.private_key_pem
   is_ca_certificate     = true
@@ -26,18 +20,19 @@ resource "tls_self_signed_cert" "ca_cert" {
   }
 
   allowed_uses = [
-    "cert_signing",
-    "crl_signing",
-    "code_signing",
     "server_auth",
     "client_auth",
-    "digital_signature",
-    "key_encipherment",
   ]
+}
+
+resource "local_file" "ca_key" {
+  content         = tls_private_key.ca_private_key.private_key_pem
+  filename        = "${path.module}/../certificates/key.pem"
+  file_permission = "0666"
 }
 
 resource "local_file" "ca_cert" {
   content         = tls_self_signed_cert.ca_cert.cert_pem
-  filename        = "${path.module}/certificates/cert.pem"
+  filename        = "${path.module}/../certificates/cert.pem"
   file_permission = "0666"
 }

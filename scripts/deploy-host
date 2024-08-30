@@ -2,5 +2,5 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-terraform init --upgrade
-terraform apply --auto-approve --var-file="${TF_VARS_FILE}"
+terraform -chdir=terraform init --upgrade
+terraform -chdir=terraform apply --var-file="${TF_VARS_FILE}"
