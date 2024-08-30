@@ -1,3 +1,7 @@
+data "http" "ipify" {
+  url = "https://api.ipify.org"
+}
+
 resource "aws_security_group" "traccar_host_security_group" {
   name = "traccar-host"
 
@@ -14,9 +18,10 @@ resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4" {
   ip_protocol       = "tcp"
 }
 
+# https://github.com/tailscale/tailscale/issues/12409
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
   security_group_id = aws_security_group.traccar_host_security_group.id
-  cidr_ipv4         = "206.83.114.95/32"
+  cidr_ipv4         = "${data.http.ipify.response_body}/32"
   from_port         = 22
   to_port           = 22
   ip_protocol       = "tcp"

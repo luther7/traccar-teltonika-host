@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+# https://github.com/tailscale/tailscale/issues/12409
+traccar_host_ip=$(ssh ubuntu@traccar-host curl --silent api.ipify.org)
+podman system connection remove traccar
+# Assumes ssh-agent contains key
+podman \
+  system \
+  connection \
+  add \
+  traccar \
+  "ssh://ubuntu@${traccar_host_ip}/run/user/1000/podman/podman.sock"

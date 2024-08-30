@@ -26,30 +26,17 @@ spec:
       storage: 12Gi
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: tailscale-data
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
 kind: Pod
 metadata:
   name: traccar
-  annotations:
-    io.podman.annotations.init.container.type: "always"
 spec:
   containers:
   - name: traccar
     image: docker.io/traccar/traccar:6.4-alpine
     ports:
+    - containerPort: 8082
+      hostPort: 8082
     - containerPort: 5052
-      hostPort: 5052
     env:
     - name: DEFAULT_JVM_OPTS
       value: -Xmx256m -Xms256m
@@ -88,27 +75,6 @@ spec:
     volumeMounts:
     - name: mysql-data
       mountPath: /var/lib/mysql
-  - name: tailscale
-    image: docker.io/tailscale/tailscale:v1.72
-    env:
-    - name: TS_HOSTNAME
-      value: traccar
-    - name: TS_STATE_DIR
-      value: /var/lib/tailscale
-    - name: TS_AUTHKEY
-      valueFrom:
-        secretKeyRef:
-          name: tailscale
-          key: auth-key
-    - name: TS_EXTRA_ARGS
-      value: --advertise-tags=tag:infrastructure
-    - name: TS_SERVE_CONFIG
-      value: /config/serve.json
-    volumeMounts:
-    - name: tailscale-config
-      mountPath: /config
-    - name: tailscale-data
-      mountPath: /var/lib/tailscale
   - name: ddclient
     image: docker.io/linuxserver/ddclient:3.11.2
     env:
@@ -139,50 +105,11 @@ spec:
           key: host
     volumeMounts:
     - name: ddclient-config
-      mountPath: /ddclient-config
-  initContainers:
-  - name: init-tailscale-serve-config
-    image: docker.io/library/busybox:1.36
-    command:
-      - sh
-      - -c
-      - |
-        cat <<EOF > /config/serve.json
-        {
-          "TCP": {
-            "443": {
-              "HTTPS": true
-            }
-          },
-          "Web": {
-            "traccar.$DOMAIN.ts.net:443": {
-              "Handlers": {
-                "/": {
-                  "Proxy": "http://traccar:8082"
-                }
-              }
-            }
-          }
-        }
-        EOF
-    env:
-    - name: DOMAIN
-      valueFrom:
-        secretKeyRef:
-          name: tailscale
-          key: domain
-    volumeMounts:
-    - name: tailscale-config
       mountPath: /config
   volumes:
-  - name: tailscale-config
-    emptydir: {}
   - name: ddclient-config
     configMap:
       name: ddclient-config
   - name: mysql-data
     persistentVolumeClaim:
       claimName: mysql-data
-  - name: tailscale-data
-    persistentVolumeClaim:
-      claimName: tailscale-data
