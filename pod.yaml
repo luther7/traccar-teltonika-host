@@ -37,6 +37,7 @@ spec:
     - containerPort: 8082
       hostPort: 8082
     - containerPort: 5052
+      hostPort: 5052
     env:
     - name: DEFAULT_JVM_OPTS
       value: -Xmx256m -Xms256m
@@ -75,6 +76,14 @@ spec:
     volumeMounts:
     - name: mysql-data
       mountPath: /var/lib/mysql
+  - name: stunnel
+    image: localhost/stunnel:latest
+    ports:
+    - containerPort: 5053
+      hostPort: 5053
+    env:
+    - name: CONNECT
+      value: traccar:5052
   - name: ddclient
     image: docker.io/linuxserver/ddclient:3.11.2
     env:

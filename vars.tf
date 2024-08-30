@@ -35,3 +35,15 @@ variable "tailscale_authkey" {
 variable "cert_common_name" {
   type = string
 }
+
+variable "cert_organization" {
+  type = string
+}
+
+variable "cert_organizational_unit" {
+  type = string
+}
+
+variable "cert_country" {
+  type = string
+}

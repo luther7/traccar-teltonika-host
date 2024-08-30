@@ -41,6 +41,15 @@ mount --all
 chown ubuntu:ubuntu --recursive /storage
 
 echo "--> Install and configure podman"
+# https://github.com/containers/podman/issues/10556
+mkdir --parents /etc/containers
+curl \
+  --fail \
+  --silent \
+  --show-error \
+  --location \
+  https://github.com/containers/common/raw/main/pkg/seccomp/seccomp.json \
+  > /etc/containers/seccomp.json
 mkdir --parents /home/ubuntu/.config/containers/
 cat <<EOF > /home/ubuntu/.config/containers/storage.conf
 [storage]
@@ -54,7 +63,9 @@ apt-get \
   --yes \
   --no-install-recommends \
   install \
-  podman
+  podman \
+  slirp4netns \
+  uidmap
 loginctl enable-linger ubuntu
 systemctl --machine=ubuntu@ --user --now enable podman.socket
 

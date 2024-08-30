@@ -1,6 +1,6 @@
 # Traccar server
 
 ## TODO
-- Offload TLS with stunnel for Teltonika port.
+- Test Teltonika TLS.
 - Fix JVM memory settings.
 - Complete read-me.
