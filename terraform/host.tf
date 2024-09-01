@@ -3,10 +3,10 @@ data "http" "ipify" {
 }
 
 resource "aws_security_group" "traccar_host_security_group" {
-  name = "traccar-host"
+  name = "traccar"
 
   tags = {
-    Name = "traccar-host"
+    Name = "traccar"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_ebs_volume" "traccar_storage" {
   encrypted         = true
 
   tags = {
-    Name = "traccar-host"
+    Name = "traccar"
   }
 
   lifecycle {
@@ -64,7 +64,7 @@ resource "aws_instance" "traccar_host_instance" {
   user_data_replace_on_change = false
 
   user_data = templatefile(
-    "${path.module}/setup-host.bash",
+    "${path.module}/setup.bash",
     { tailscale_authkey = var.tailscale_authkey }
   )
 
@@ -74,11 +74,11 @@ resource "aws_instance" "traccar_host_instance" {
   }
 
   volume_tags = {
-    Name = "traccar-host"
+    Name = "traccar"
   }
 
   tags = {
-    Name = "traccar-host"
+    Name = "traccar"
   }
 }
 

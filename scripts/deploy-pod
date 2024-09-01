@@ -9,13 +9,13 @@ podman --connection=traccar build --tag=stunnel --file=stunnel/Containerfile .
 echo "--> Creating k8s secrets"
 podman --connection=traccar kube play --quiet <(envsubst < podman/secrets.yaml)
 echo "--> Copying podman files"
-ssh ubuntu@traccar-host mkdir \
+ssh ubuntu@traccar mkdir \
   --parents \
   .config/containers/systemd \
   .config/containers/manifests
-scp podman/traccar.yaml ubuntu@traccar-host:.config/containers/manifests
-scp podman/traccar.kube ubuntu@traccar-host:.config/containers/systemd
+scp podman/traccar.yaml ubuntu@traccar:.config/containers/manifests
+scp podman/traccar.kube ubuntu@traccar:.config/containers/systemd
 echo "--> Start services"
-ssh ubuntu@traccar-host systemctl --user daemon-reload
-ssh ubuntu@traccar-host systemctl --user restart traccar
+ssh ubuntu@traccar systemctl --user daemon-reload
+ssh ubuntu@traccar systemctl --user restart traccar
 echo "--> Completed deploy-pod"

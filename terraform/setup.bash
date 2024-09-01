@@ -24,7 +24,7 @@ sysctl --load=/etc/sysctl.d/99-tailscale.conf
 tailscale \
   up \
   --authkey="${tailscale_authkey}" \
-  --hostname="traccar-host" \
+  --hostname="traccar" \
   --ssh=true
 tailscale serve --bg 8082
 
