@@ -2,5 +2,7 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+echo "--> Starting deploy-all"
 ./scripts/deploy-host
 ./scripts/deploy-pod
+echo "--> Completed deploy-all"

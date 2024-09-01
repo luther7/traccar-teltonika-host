@@ -4,8 +4,8 @@
 .envrc.template
 .git
 .gitignore
-k8s
 LICENSE
+podman
 README.md
 scripts
 terraform

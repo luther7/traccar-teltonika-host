@@ -2,7 +2,20 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+echo "--> Starting deploy-pod"
 ./scripts/create-podman-connection
+echo "--> Building stunnel image"
 podman --connection=traccar build --tag=stunnel --file=stunnel/Containerfile .
-podman --connection=traccar kube play --replace "k8s/${PODMAN_SECRETS_FILE}"
-podman --connection=traccar kube play --replace k8s/pod.yaml
+echo "--> Creating k8s secrets"
+podman --connection=traccar kube play --quiet <(envsubst < podman/secrets.yaml)
+echo "--> Copying podman files"
+ssh ubuntu@traccar-host mkdir \
+  --parents \
+  .config/containers/systemd \
+  .config/containers/manifests
+scp podman/traccar.yaml ubuntu@traccar-host:.config/containers/manifests
+scp podman/traccar.kube ubuntu@traccar-host:.config/containers/systemd
+echo "--> Start services"
+ssh ubuntu@traccar-host systemctl --user daemon-reload
+ssh ubuntu@traccar-host systemctl --user restart traccar
+echo "--> Completed deploy-pod"
