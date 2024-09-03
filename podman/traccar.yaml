@@ -9,7 +9,8 @@ spec:
     image: docker.io/traccar/traccar:6.4-alpine
     ports:
     - hostPort: 8082
-    - containerPort: 5052
+    - hostPort: 5052
+      containerPort: 5052
     command: ["java", "-Xms512m", "-Xmx512m", "-Djava.net.preferIPv4Stack=true"]
     args: ["-jar", "tracker-server.jar", "conf/traccar.xml"]
     env:
