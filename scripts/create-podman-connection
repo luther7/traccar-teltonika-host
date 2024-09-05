@@ -2,10 +2,13 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+source scripts/utils.bash
 echo "--> Starting create-podman-connection"
 echo "--> Creating podman connection to traccar host"
 # https://github.com/tailscale/tailscale/issues/12409
-traccar_host_ip=$(ssh ubuntu@traccar curl --silent api.ipify.org)
+traccar_host_ip=$( \
+  ssh_traccar curl --silent api.ipify.org \
+)
 podman system connection remove traccar
 # Assumes ssh-agent contains key
 podman \
