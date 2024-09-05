@@ -29,14 +29,33 @@ tailscale \
 tailscale serve --bg 8082
 
 echo "--> Mount storage volume"
-if ! file --special-files --dereference /dev/nvme1n1 | grep --silent ext4; then
-  mkfs.ext4 /dev/nvme1n1
+# shellcheck disable=SC2154
+storage_name=$( \
+  lsblk \
+  --output name,size \
+  | grep "${storage_volume_size}G" \
+  | awk '{ print $1 }' \
+)
+# shellcheck disable=SC2154
+storage_uuid=$( \
+  lsblk \
+  --output name,size,UUID \
+  | grep "${storage_volume_size}G" \
+  | awk '{ print $3 }' \
+)
+if ! \
+  file \
+  --special-files \
+  --dereference \
+  "/dev/$storage_name" \
+  | grep --silent ext4; \
+then
+  mkfs.ext4 "/dev/$storage_name"
 fi
 mkdir /storage
-storage_uuid=$(lsblk --output name,UUID | grep nvme1n1 | awk '{ print $2 }')
 echo "UUID=$storage_uuid  /storage  ext4  defaults,nofail  0  2" >> /etc/fstab
 systemctl daemon-reload
-mount /dev/nvme1n1 /storage
+mount "/dev/$storage_name" /storage
 mount --all
 chown ubuntu:ubuntu --recursive /storage
 
