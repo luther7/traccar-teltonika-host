@@ -10,7 +10,15 @@ resource "aws_security_group" "traccar_host_security_group" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4" {
+resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4_tls" {
+  security_group_id = aws_security_group.traccar_host_security_group.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 5053
+  to_port           = 5053
+  ip_protocol       = "tcp"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4_clear" {
   security_group_id = aws_security_group.traccar_host_security_group.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 5052
@@ -61,11 +69,14 @@ resource "aws_instance" "traccar_host_instance" {
   security_groups             = [aws_security_group.traccar_host_security_group.name]
   key_name                    = var.ssh_key_name
   associate_public_ip_address = true
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
 
   user_data = templatefile(
     "${path.module}/setup.bash",
-    { tailscale_authkey = var.tailscale_authkey }
+    {
+      tailscale_authkey   = var.tailscale_authkey
+      storage_volume_size = var.storage_volume_size
+    }
   )
 
   root_block_device {
