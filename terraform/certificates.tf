@@ -3,7 +3,8 @@ locals {
 }
 
 resource "tls_private_key" "ca_private_key" {
-  algorithm   = "ECDSA"
+  algorithm   = "RSA"
+  rsa_bits    = 4096
   ecdsa_curve = "P384"
 }
 
@@ -27,12 +28,12 @@ resource "tls_self_signed_cert" "ca_cert" {
 
 resource "local_file" "ca_key" {
   content         = tls_private_key.ca_private_key.private_key_pem
-  filename        = "${path.module}/../certificates/key.pem"
+  filename        = "${path.module}/../certificates/ca-private-key.pem.key"
   file_permission = "0666"
 }
 
 resource "local_file" "ca_cert" {
   content         = tls_self_signed_cert.ca_cert.cert_pem
-  filename        = "${path.module}/../certificates/cert.pem"
+  filename        = "${path.module}/../certificates/ca-cert.pem"
   file_permission = "0666"
 }

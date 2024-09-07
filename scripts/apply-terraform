@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+source scripts/utils.bash
+echo "--> Starting apply-terraform"
+_terraform init --upgrade
+_terraform apply --var-file="${TF_VARS_FILE}" -auto-approve
+echo "--> Completed apply-terraform"

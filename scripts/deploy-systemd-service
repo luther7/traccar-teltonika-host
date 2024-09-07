@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+source scripts/utils.bash
+echo "--> Starting deploy-systemd-service"
+_ssh mkdir --parents .config/containers/systemd
+_scp podman/traccar.kube .config/containers/systemd
+_ssh systemctl --user daemon-reload
+_ssh systemctl --user restart traccar
+echo "--> Completed deploy-systemd-service"

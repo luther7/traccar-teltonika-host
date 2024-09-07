@@ -3,6 +3,10 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 echo "--> Starting deploy-all"
-./scripts/deploy-host
+./scripts/apply-terraform
+./scripts/create-podman-connection
+./scripts/build-stunnel-image
+./scripts/play-secrets
 ./scripts/deploy-pod
+./scripts/deploy-systemd-service
 echo "--> Completed deploy-all"

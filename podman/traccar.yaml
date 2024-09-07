@@ -9,8 +9,8 @@ spec:
     image: docker.io/traccar/traccar:6.4-alpine
     ports:
     - hostPort: 8082
-    - hostPort: 5052
-      containerPort: 5052
+    - hostPort: 5027
+      containerPort: 5027
     command: ["java", "-Xms512m", "-Xmx512m", "-Djava.net.preferIPv4Stack=true"]
     args: ["-jar", "tracker-server.jar", "conf/traccar.xml"]
     env:
@@ -37,10 +37,10 @@ spec:
   - name: stunnel
     image: localhost/stunnel:latest
     ports:
-    - hostPort: 5053
+    - hostPort: 5200
     env:
     - name: CONNECT
-      value: traccar-traccar:5052
+      value: traccar-traccar:5027
   - name: mysql
     image: docker.io/library/mysql:9.0
     env:

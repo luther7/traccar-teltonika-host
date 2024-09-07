@@ -1,6 +1,6 @@
 FROM alpine:3.20
 
-EXPOSE 5053
+EXPOSE 5200
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.20/main/" \
   >> /etc/apk/repositories \
   && echo "https://dl-cdn.alpinelinux.org/alpine/v3.20/community/" \

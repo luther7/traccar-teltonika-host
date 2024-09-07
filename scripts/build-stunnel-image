@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+source scripts/utils.bash
+echo "--> Starting build-stunnel-image"
+_podman build --tag=stunnel --file=stunnel/Containerfile .
+echo "--> Completed build-stunnel-image"

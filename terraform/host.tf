@@ -13,16 +13,16 @@ resource "aws_security_group" "traccar_host_security_group" {
 resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4_tls" {
   security_group_id = aws_security_group.traccar_host_security_group.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 5053
-  to_port           = 5053
+  from_port         = 5200
+  to_port           = 5200
   ip_protocol       = "tcp"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4_clear" {
   security_group_id = aws_security_group.traccar_host_security_group.id
+  from_port         = 5027
+  to_port           = 5027
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 5052
-  to_port           = 5052
   ip_protocol       = "tcp"
 }
 

@@ -11,10 +11,10 @@ socket = r:TCP_NODELAY=1
 syslog = no
 foreground = yes
 [traccar]
-CAfile = ${CERT:-/certificates/cert.pem}
-cert = ${CERT:-/certificates/cert.pem}
-key = ${CERT:-/certificates/key.pem}
-accept = 5053
+CAfile = ${CERT:-/certificates/ca-cert.pem}
+cert = ${CERT:-/certificates/ca-cert.pem}
+key = ${CERT:-/certificates/ca-private-key.pem.key}
+accept = 5200
 connect = ${CONNECT}
 sslVersion = TLSv1.2
 options = NO_SSLv2

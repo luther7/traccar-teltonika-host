@@ -4,20 +4,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 source scripts/utils.bash
 echo "--> Starting deploy-pod"
-./scripts/create-podman-connection
-echo "--> Building stunnel image"
-podman_traccar build --tag=stunnel --file=stunnel/Containerfile .
-echo "--> Creating k8s secrets"
-podman_traccar kube play --quiet <(envsubst < podman/secrets.yaml)
-echo "--> Copying podman files"
-ssh_traccar \
-  mkdir \
-  --parents \
-  .config/containers/systemd \
-  .config/containers/manifests
-scp_traccar podman/traccar.yaml .config/containers/manifests
-scp_traccar podman/traccar.kube .config/containers/systemd
-echo "--> Start services"
-ssh_traccar systemctl --user daemon-reload
-ssh_traccar systemctl --user restart traccar
+_ssh mkdir --parents .config/containers/manifests
+_scp podman/traccar.yaml .config/containers/manifests
+_ssh systemctl --user daemon-reload
+_ssh systemctl --user try-restart traccar
 echo "--> Completed deploy-pod"
