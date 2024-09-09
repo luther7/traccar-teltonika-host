@@ -8,7 +8,7 @@ resource "tls_private_key" "ca_private_key" {
   ecdsa_curve = "P384"
 }
 
-resource "tls_self_signed_cert" "ca_cert" {
+resource "tls_self_signed_cert" "ca_certificate" {
   private_key_pem       = tls_private_key.ca_private_key.private_key_pem
   is_ca_certificate     = true
   validity_period_hours = local.five_years
@@ -32,8 +32,8 @@ resource "local_file" "ca_private_key" {
   file_permission = "0666"
 }
 
-resource "local_file" "ca_cert" {
-  content         = tls_self_signed_cert.ca_cert.cert_pem
+resource "local_file" "ca_certificate" {
+  content         = tls_self_signed_cert.ca_certificate.cert_pem
   filename        = "${path.module}/../out/certificates/ca-certificate.pem"
   file_permission = "0666"
 }

@@ -14,11 +14,7 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "traccar-terraform-state"
-    key    = "terraform-state"
-    region = "ap-southeast-2"
-  }
+  backend "s3" {}
 }
 
 provider "aws" {

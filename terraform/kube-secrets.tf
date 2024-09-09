@@ -6,7 +6,7 @@ resource "local_file" "certificates_kube_secret" {
       "name" : "certificates"
     }
     "data" : {
-      "ca-certificate.pem" : base64encode(tls_self_signed_cert.ca_cert.cert_pem)
+      "ca-certificate.pem" : base64encode(tls_self_signed_cert.ca_certificate.cert_pem)
       "ca-private-key.pem" : base64encode(tls_private_key.ca_private_key.private_key_pem)
     }
   }))
