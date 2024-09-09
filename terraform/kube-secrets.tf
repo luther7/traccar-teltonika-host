@@ -22,11 +22,11 @@ resource "local_file" "ddclient_kube_secret" {
       "name" : "ddclient"
     }
     "data" : {
-      "protocol": base64encode(var.ddclient_protocol)
-      "user": base64encode(var.ddclient_user)
-      "password": base64encode(var.ddclient_password)
-      "zone": base64encode(var.ddclient_zone)
-      "host": base64encode(var.ddclient_host)
+      "protocol" : base64encode(var.ddclient_protocol)
+      "user" : base64encode(var.ddclient_user)
+      "password" : base64encode(var.ddclient_password)
+      "zone" : base64encode(var.ddclient_zone)
+      "host" : base64encode(var.ddclient_host)
     }
   }))
   filename        = "${path.module}/../out/kube/ddclient-secret.yaml"

@@ -57,7 +57,7 @@ variable "ddclient_user" {
 }
 
 variable "ddclient_password" {
-  type = string
+  type      = string
   sensitive = true
 }
 
