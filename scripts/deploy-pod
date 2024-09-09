@@ -4,8 +4,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 source scripts/utils.bash
 echo "--> Starting deploy-pod"
-_ssh mkdir --parents .config/containers/manifests
-_scp podman/traccar.yaml .config/containers/manifests
-_ssh systemctl --user daemon-reload
-_ssh systemctl --user try-restart traccar
+_scp podman/traccar.yaml /storage/traccar.yaml
+_ssh systemctl --user restart traccar
 echo "--> Completed deploy-pod"

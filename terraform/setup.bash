@@ -88,4 +88,20 @@ apt-get \
 loginctl enable-linger ubuntu
 systemctl --machine=ubuntu@ --user --now enable podman.socket
 
+echo "--> Install and start traccar systemd unit"
+mkdir --parents /home/ubuntu/.config/containers/systemd
+cat <<EOF > /home/ubuntu/.config/containers/systemd/traccar.kube
+[Install]
+WantedBy=default.target
+
+[Unit]
+Description=Traccar
+
+[Kube]
+Yaml=/storage/traccar.yaml
+EOF
+chown ubuntu:ubuntu --recursive /home/ubuntu/.config/containers/systemd
+systemctl --machine=ubuntu@ --user daemon-reload
+systemctl --machine=ubuntu@ --user start traccar || true
+
 echo "-- Completed Traccar host setup script"

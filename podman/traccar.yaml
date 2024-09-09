@@ -9,6 +9,7 @@ spec:
     image: docker.io/traccar/traccar:6.4-alpine
     ports:
     - hostPort: 8082
+    - hostPort: 5027
     command: ["java", "-Xms256m", "-Xmx256m", "-Djava.net.preferIPv4Stack=true"]
     args: ["-jar", "tracker-server.jar", "conf/traccar.xml"]
     env:
@@ -42,7 +43,7 @@ spec:
     - name: NGINX_PORT
       value: "5200"
     - name: NGINX_UPSTREAM_SERVER
-      value: traccar:5027
+      value: traccar-traccar:5027
     - name: NGINX_CERTIFICATE
       value: /certificates/ca-certificate.pem
     - name: NGINX_CERTIFICATE_KEY
@@ -56,6 +57,8 @@ spec:
       mountPath: /certificates
   - name: mysql
     image: docker.io/library/mysql:9.0
+    ports:
+    - hostPort: 3306
     env:
     - name: MYSQL_ROOT_PASSWORD
       valueFrom:
