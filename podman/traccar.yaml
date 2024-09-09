@@ -9,9 +9,7 @@ spec:
     image: docker.io/traccar/traccar:6.4-alpine
     ports:
     - hostPort: 8082
-    - hostPort: 5027
-      containerPort: 5027
-    command: ["java", "-Xms512m", "-Xmx512m", "-Djava.net.preferIPv4Stack=true"]
+    command: ["java", "-Xms256m", "-Xmx256m", "-Djava.net.preferIPv4Stack=true"]
     args: ["-jar", "tracker-server.jar", "conf/traccar.xml"]
     env:
     - name: CONFIG_USE_ENVIRONMENT_VARIABLES
@@ -34,13 +32,28 @@ spec:
           key: password
     - name: DATABASE_URL
       value: jdbc:mysql://traccar-mysql/traccar
-  - name: stunnel
-    image: localhost/stunnel:latest
+  - name: nginx
+    image: docker.io/library/nginx:1.27-alpine
     ports:
     - hostPort: 5200
     env:
-    - name: CONNECT
-      value: traccar-traccar:5027
+    - name: NGINX_ENVSUBST_OUTPUT_DIR
+      value: /etc/nginx
+    - name: NGINX_PORT
+      value: "5200"
+    - name: NGINX_UPSTREAM_SERVER
+      value: traccar:5027
+    - name: NGINX_CERTIFICATE
+      value: /certificates/ca-certificate.pem
+    - name: NGINX_CERTIFICATE_KEY
+      value: /certificates/ca-private-key.pem
+    - name: NGINX_TRUSTED_CERTIFICATE
+      value: /certificates/ca-certificate.pem
+    volumeMounts:
+    - name: nginx-config
+      mountPath: /etc/nginx/templates
+    - name: certificates
+      mountPath: /certificates
   - name: mysql
     image: docker.io/library/mysql:9.0
     env:
@@ -102,9 +115,42 @@ spec:
   - name: mysql-data
     persistentVolumeClaim:
       claimName: mysql-data
+  - name: certificates
+    secret:
+      secretName: certificates
+  - name: nginx-config
+    configMap:
+      name: nginx-config
   - name: ddclient-config
     configMap:
       name: ddclient-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf.template: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log notice;
+    pid /var/run/nginx.pid;
+    events {
+      worker_connections 1024;
+    }
+    stream {
+      upstream traccar {
+        server ${NGINX_UPSTREAM_SERVER};
+      }
+      server {
+        listen ${NGINX_PORT} ssl;
+        proxy_pass traccar;
+        ssl_protocols TLSv1.1 TLSv1.2 TLSv1.3;
+        ssl_certificate ${NGINX_CERTIFICATE};
+        ssl_certificate_key ${NGINX_CERTIFICATE_KEY};
+        ssl_trusted_certificate ${NGINX_TRUSTED_CERTIFICATE};
+      }
+    }
 ---
 apiVersion: v1
 kind: ConfigMap

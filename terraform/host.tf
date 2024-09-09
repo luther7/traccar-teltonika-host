@@ -18,14 +18,6 @@ resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4_tls" {
   ip_protocol       = "tcp"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_teltonika_ipv4_clear" {
-  security_group_id = aws_security_group.traccar_host_security_group.id
-  from_port         = 5027
-  to_port           = 5027
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "tcp"
-}
-
 # https://github.com/tailscale/tailscale/issues/12409
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
   security_group_id = aws_security_group.traccar_host_security_group.id
