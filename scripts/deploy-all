@@ -2,9 +2,9 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-echo "--> Starting deploy"
+echo "--> Starting deploy-all"
 ./scripts/apply-terraform
 ./scripts/create-podman-connection
 ./scripts/deploy-secrets
 ./scripts/deploy-pod
-echo "--> Completed deploy"
+echo "--> Completed deploy-all"
