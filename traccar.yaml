@@ -19,20 +19,9 @@ spec:
       value: "300"
     - name: LOGGER_CONSOLE
       value: "true"
-    - name: DATABASE_DRIVER
-      value: "com.mysql.cj.jdbc.Driver"
-    - name: DATABASE_USER
-      valueFrom:
-        secretKeyRef:
-          name: mysql
-          key: user
-    - name: DATABASE_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql
-          key: password
-    - name: DATABASE_URL
-      value: jdbc:mysql://traccar-mysql/traccar
+    volumeMounts:
+    - name: traccar-data
+      mountPath: /opt/traccar/data
   - name: nginx
     image: docker.io/library/nginx:1.27-alpine
     ports:
@@ -55,34 +44,6 @@ spec:
       mountPath: /etc/nginx/templates
     - name: certificates
       mountPath: /certificates
-  - name: mysql
-    image: docker.io/library/mysql:9.0
-    ports:
-    - hostPort: 3306
-    env:
-    - name: MYSQL_ROOT_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql
-          key: rootPassword
-    - name: MYSQL_USER
-      valueFrom:
-        secretKeyRef:
-          name: mysql
-          key: user
-    - name: MYSQL_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql
-          key: password
-    - name: MYSQL_DATABASE
-      valueFrom:
-        secretKeyRef:
-          name: mysql
-          key: database
-    volumeMounts:
-    - name: mysql-data
-      mountPath: /var/lib/mysql
   - name: ddclient
     image: docker.io/linuxserver/ddclient:3.11.2
     env:
@@ -115,9 +76,9 @@ spec:
     - name: ddclient-config
       mountPath: /config
   volumes:
-  - name: mysql-data
+  - name: traccar-data
     persistentVolumeClaim:
-      claimName: mysql-data
+      claimName: traccar-data
   - name: certificates
     secret:
       secretName: certificates

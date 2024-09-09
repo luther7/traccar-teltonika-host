@@ -26,30 +26,14 @@ resource "tls_self_signed_cert" "ca_cert" {
   ]
 }
 
+resource "local_file" "ca_private_key" {
+  content         = tls_private_key.ca_private_key.private_key_pem
+  filename        = "${path.module}/../out/certificates/ca-private-key.pem"
+  file_permission = "0666"
+}
+
 resource "local_file" "ca_cert" {
   content         = tls_self_signed_cert.ca_cert.cert_pem
-  filename        = "${path.module}/../certificates/ca-certificate.pem"
-  file_permission = "0666"
-}
-
-resource "local_file" "ca_key" {
-  content         = tls_private_key.ca_private_key.private_key_pem
-  filename        = "${path.module}/../certificates/ca-private-key.pem"
-  file_permission = "0666"
-}
-
-resource "local_file" "kube_secret" {
-  content = (yamlencode({
-    "apiVersion" : "v1"
-    "kind" : "Secret"
-    "metadata" : {
-      "name" : "certificates"
-    }
-    "data" : {
-      "ca-certificate.pem" : base64encode(tls_self_signed_cert.ca_cert.cert_pem)
-      "ca-private-key.pem" : base64encode(tls_private_key.ca_private_key.private_key_pem)
-    }
-  }))
-  filename        = "${path.module}/../certificates/certificates.yaml"
+  filename        = "${path.module}/../out/certificates/ca-certificate.pem"
   file_permission = "0666"
 }

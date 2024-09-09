@@ -4,6 +4,8 @@ set -euo pipefail
 echo "-- Beginning Traccar host setup script"
 
 echo "--> Update and upgrade packages"
+apt-get --quiet --yes remove snapd
+apt-mark hold snapd
 apt-get --quiet --yes --no-install-recommends update
 apt-get --quiet --yes --no-install-recommends upgrade
 

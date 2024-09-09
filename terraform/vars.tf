@@ -5,7 +5,7 @@ variable "ami" {
 
 variable "instance_type" {
   type    = string
-  default = "t4g.small"
+  default = "t4g.micro"
 }
 
 variable "availability_zone" {
@@ -45,5 +45,26 @@ variable "cert_organizational_unit" {
 }
 
 variable "cert_country" {
+  type = string
+}
+
+variable "ddclient_protocol" {
+  type = string
+}
+
+variable "ddclient_user" {
+  type = string
+}
+
+variable "ddclient_password" {
+  type = string
+  sensitive = true
+}
+
+variable "ddclient_zone" {
+  type = string
+}
+
+variable "ddclient_host" {
   type = string
 }
