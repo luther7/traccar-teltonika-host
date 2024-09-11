@@ -4,4 +4,10 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - run: ./scripts/lint-all
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install linters
+        run: sudo apt-get install --yes terraform shfmt shellcheck
+      - name: Run linters
+        run: ./scripts/lint-all
