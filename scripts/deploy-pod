@@ -4,6 +4,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 source scripts/utils.bash
 echo "--> Starting deploy-pod"
-_scp traccar.yaml /storage/traccar.yaml
+scp \
+  -o StrictHostKeychecking=no \
+  traccar.yaml \
+  "ubuntu@traccar:/storage/traccar.yaml"
 _ssh systemctl --user restart traccar
 echo "--> Completed deploy-pod"

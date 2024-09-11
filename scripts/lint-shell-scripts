@@ -2,6 +2,6 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-shellcheck --exclude=SC1091 terraform/setup.bash
+shellcheck --exclude=SC1091 setup-host.bash
 find scripts -type f -exec shellcheck --exclude=SC1091 {} \;
 shfmt -d .

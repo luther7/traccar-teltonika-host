@@ -10,7 +10,7 @@ resource "local_file" "certificates_kube_secret" {
       "ca-private-key.pem" : base64encode(tls_private_key.ca_private_key.private_key_pem)
     }
   }))
-  filename        = "${path.module}/../out/kube/certificates-secret.yaml"
+  filename        = "${path.module}/out/kube/certificates-secret.yaml"
   file_permission = "0666"
 }
 
@@ -29,6 +29,6 @@ resource "local_file" "ddclient_kube_secret" {
       "host" : base64encode(var.ddclient_host)
     }
   }))
-  filename        = "${path.module}/../out/kube/ddclient-secret.yaml"
+  filename        = "${path.module}/out/kube/ddclient-secret.yaml"
   file_permission = "0666"
 }

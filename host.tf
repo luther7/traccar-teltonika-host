@@ -74,7 +74,7 @@ resource "aws_instance" "traccar_host_instance" {
   user_data_replace_on_change = true
 
   user_data = templatefile(
-    "${path.module}/setup.bash",
+    "${path.module}/setup-host.bash",
     {
       tailscale_authkey   = tailscale_tailnet_key.traccar_host_key.key
       storage_volume_size = var.storage_volume_size

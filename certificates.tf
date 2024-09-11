@@ -28,12 +28,12 @@ resource "tls_self_signed_cert" "ca_certificate" {
 
 resource "local_file" "ca_private_key" {
   content         = tls_private_key.ca_private_key.private_key_pem
-  filename        = "${path.module}/../out/certificates/ca-private-key.pem"
+  filename        = "${path.module}/out/certificates/ca-private-key.pem"
   file_permission = "0666"
 }
 
 resource "local_file" "ca_certificate" {
   content         = tls_self_signed_cert.ca_certificate.cert_pem
-  filename        = "${path.module}/../out/certificates/ca-certificate.pem"
+  filename        = "${path.module}/out/certificates/ca-certificate.pem"
   file_permission = "0666"
 }
