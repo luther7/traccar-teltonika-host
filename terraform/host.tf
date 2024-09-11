@@ -53,6 +53,16 @@ resource "aws_ebs_volume" "traccar_storage" {
   }
 }
 
+resource "tailscale_tailnet_key" "traccar_host_key" {
+  reusable            = true
+  ephemeral           = true
+  preauthorized       = true
+  recreate_if_invalid = "always"
+  expiry              = 3600
+  description         = "Traccar host key"
+  tags                = var.tailscale_tags
+}
+
 resource "aws_instance" "traccar_host_instance" {
   # Ubuntu 24.04 arm64 ap-southeast-2
   ami                         = var.ami
@@ -66,7 +76,7 @@ resource "aws_instance" "traccar_host_instance" {
   user_data = templatefile(
     "${path.module}/setup.bash",
     {
-      tailscale_authkey   = var.tailscale_authkey
+      tailscale_authkey   = tailscale_tailnet_key.traccar_host_key.key
       storage_volume_size = var.storage_volume_size
     }
   )

@@ -27,9 +27,8 @@ variable "ssh_key_name" {
   type = string
 }
 
-variable "tailscale_authkey" {
-  type      = string
-  sensitive = true
+variable "tailscale_tags" {
+  type = list(string)
 }
 
 variable "cert_common_name" {
