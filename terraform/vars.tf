@@ -5,7 +5,7 @@ variable "ami" {
 
 variable "instance_type" {
   type    = string
-  default = "t4g.micro"
+  default = "t4g.nano"
 }
 
 variable "availability_zone" {
