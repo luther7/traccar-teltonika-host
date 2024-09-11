@@ -15,9 +15,9 @@ curl \
   --silent \
   --show-error \
   --location \
-  https://tailscale.com/install.sh \
-  | sh
-cat <<EOF > /etc/sysctl.d/99-tailscale.conf
+  https://tailscale.com/install.sh |
+  sh
+cat <<EOF >/etc/sysctl.d/99-tailscale.conf
 net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
 EOF
@@ -32,30 +32,28 @@ tailscale serve --bg 8082
 
 echo "--> Mount storage volume"
 # shellcheck disable=SC2154
-storage_name=$( \
+storage_name=$(
   lsblk \
-  --output name,size \
-  | grep "${storage_volume_size}G" \
-  | awk '{ print $1 }' \
+    --output name,size |
+    grep "${storage_volume_size}G" |
+    awk '{ print $1 }'
 )
 # shellcheck disable=SC2154
-storage_uuid=$( \
+storage_uuid=$(
   lsblk \
-  --output name,size,UUID \
-  | grep "${storage_volume_size}G" \
-  | awk '{ print $3 }' \
+    --output name,size,UUID |
+    grep "${storage_volume_size}G" |
+    awk '{ print $3 }'
 )
-if ! \
-  file \
+if ! file \
   --special-files \
   --dereference \
-  "/dev/$storage_name" \
-  | grep --silent ext4; \
-then
+  "/dev/$storage_name" |
+  grep --silent ext4; then
   mkfs.ext4 "/dev/$storage_name"
 fi
 mkdir /storage
-echo "UUID=$storage_uuid  /storage  ext4  defaults,nofail  0  2" >> /etc/fstab
+echo "UUID=$storage_uuid  /storage  ext4  defaults,nofail  0  2" >>/etc/fstab
 systemctl daemon-reload
 mount "/dev/$storage_name" /storage
 mount --all
@@ -70,9 +68,9 @@ curl \
   --show-error \
   --location \
   https://github.com/containers/common/raw/main/pkg/seccomp/seccomp.json \
-  > /etc/containers/seccomp.json
+  >/etc/containers/seccomp.json
 mkdir --parents /home/ubuntu/.config/containers/
-cat <<EOF > /home/ubuntu/.config/containers/storage.conf
+cat <<EOF >/home/ubuntu/.config/containers/storage.conf
 [storage]
 driver = "overlay"
 runroot = "/run/user/1000/containers"
@@ -92,7 +90,7 @@ systemctl --machine=ubuntu@ --user --now enable podman.socket
 
 echo "--> Install and start traccar systemd unit"
 mkdir --parents /home/ubuntu/.config/containers/systemd
-cat <<EOF > /home/ubuntu/.config/containers/systemd/traccar.kube
+cat <<EOF >/home/ubuntu/.config/containers/systemd/traccar.kube
 [Install]
 WantedBy=default.target
 
