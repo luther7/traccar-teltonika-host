@@ -9,7 +9,12 @@ spec:
     image: docker.io/traccar/traccar:6.4-alpine
     ports:
     - hostPort: 8082
-    command: ["java", "-Xms64m", "-Xmx64m", "-Djava.net.preferIPv4Stack=true"]
+    command:
+    - "java"
+    - "-Xms48m"
+    - "-Xmx48m"
+    - "-XX:MaxMetaspaceSize=64m"
+    - "-XX:ReservedCodeCacheSize=4m"
     args: ["-jar", "tracker-server.jar", "conf/traccar.xml"]
     env:
     - name: CONFIG_USE_ENVIRONMENT_VARIABLES
@@ -23,9 +28,9 @@ spec:
       mountPath: /opt/traccar/data
     resources:
       requests:
-        memory: "196Mi"
+        memory: "172Mi"
       limits:
-        memory: "196Mi"
+        memory: "172Mi"
   - name: nginx
     image: docker.io/library/nginx:1.27-alpine
     ports:
@@ -48,6 +53,11 @@ spec:
       mountPath: /etc/nginx/templates
     - name: certificates
       mountPath: /certificates
+    resources:
+      requests:
+        memory: "16Mi"
+      limits:
+        memory: "16Mi"
   - name: ddclient
     image: docker.io/linuxserver/ddclient:3.11.2
     env:
@@ -79,6 +89,11 @@ spec:
     volumeMounts:
     - name: ddclient-config
       mountPath: /config
+    resources:
+      requests:
+        memory: "16Mi"
+      limits:
+        memory: "16Mi"
   volumes:
   - name: traccar-data
     persistentVolumeClaim:
