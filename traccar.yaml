@@ -91,9 +91,9 @@ spec:
       mountPath: /config
     resources:
       requests:
-        memory: "16Mi"
+        memory: "24Mi"
       limits:
-        memory: "16Mi"
+        memory: "24Mi"
   volumes:
   - name: traccar-data
     persistentVolumeClaim:

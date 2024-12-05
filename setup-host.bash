@@ -30,6 +30,9 @@ tailscale \
   --ssh=true
 tailscale serve --bg 8082
 
+echo "--> Disable multipathd"
+systemctl disable --now multipathd
+
 echo "--> Mount storage volume"
 # shellcheck disable=SC2154
 storage_name=$(
