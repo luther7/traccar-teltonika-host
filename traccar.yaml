@@ -28,9 +28,9 @@ spec:
       mountPath: /opt/traccar/data
     resources:
       requests:
-        memory: "172Mi"
+        memory: "180Mi"
       limits:
-        memory: "172Mi"
+        memory: "180Mi"
   - name: nginx
     image: docker.io/library/nginx:1.27-alpine
     ports:
@@ -55,9 +55,9 @@ spec:
       mountPath: /certificates
     resources:
       requests:
-        memory: "16Mi"
+        memory: "8Mi"
       limits:
-        memory: "16Mi"
+        memory: "8Mi"
   - name: ddclient
     image: docker.io/linuxserver/ddclient:3.11.2
     env:
