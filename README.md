@@ -29,7 +29,7 @@ architecture-beta
     service user(server)[User]
     service fmc920(server)[Teltonika FMC920] in vehicle
     service dns(internet)[Dynamic DNS provider]
-    service ebs(disk)[EBS volume]
+    service ebs(logos:aws-aurora)[EBS volume]
     user:R --> L:browser
     browser:T --> B:user_interface
     user_interface:R --> L:server_interface
@@ -58,9 +58,9 @@ Copy the Terraform variable template.
 cp template.tfvars vars.tfvars
 ```
 Deployment scripts expect the Terraform variables file to be named `vars.tfvars`. Edit the file 
-and enter any required values.
-[Details and instructions for each variable may be found in the template](./template.tfvars).
-Additional variables and their defaults are declared in [the Terraform vars file](./vars.tf).
+and enter any required values. Details and instructions for each variable may be found in
+[the template](./template.tfvars). Additional variables and their defaults are declared in
+[the Terraform vars file](./vars.tf).
 
 #### 2. Prepare TF backend
 
@@ -72,7 +72,7 @@ cp config.s3.tfbackend template.config.s3.tfbackend
 ```
 
 If you wish to use an alternative backend, update [the Terraform config](./terraform.tf). Also
-update the [Terraform apply script](./scripts/apply-terraform) to reference any partial backend
+update [the Terraform apply script](./scripts/apply-terraform) to reference any partial backend
 files (or remove the existing argument).
 
 #### 3. Provision resources with Terraform
@@ -96,8 +96,8 @@ The server is configured to:
    reboot. Create a filesystem on the volume if none exists.
 4. Install and configure podman. Set the podman graph root to `/storage`. This provides persistent
    database data.
-5. Install a
-   [systemd unit to run the pod](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
+5. Install
+   [a systemd unit to run the pod](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
    with manifest located at `/storage/traccar.yaml`. The
    manifest is updated in a later step.
 
@@ -124,7 +124,7 @@ references these secrets.
 ./scripts/deploy-pod
 ```
 
-This copies the [pod manifest](./traccar.yaml) to `/storage/traccar.yaml` on the server which 
+This copies [the pod manifest](./traccar.yaml) to `/storage/traccar.yaml` on the server which 
 [systemd Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html) service
 - named traccar - references. After the manifest is copied, the traccar service is restarted.
 
