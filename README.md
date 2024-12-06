@@ -11,8 +11,6 @@ A server for [Traccar](https://www.traccar.org/) supporting
 
 ## Architecture
 
-![Architecture diagram](diagram.png)
-
 ```mermaid
 architecture-beta
     group users_machine[Users machine]
@@ -29,7 +27,7 @@ architecture-beta
     service user(server)[User]
     service fmc920(server)[Teltonika FMC920] in vehicle
     service dns(internet)[Dynamic DNS provider]
-    service ebs(logos:aws-aurora)[EBS volume]
+    service ebs(disk)[EBS volume]
     user:R --> L:browser
     browser:T --> B:user_interface
     user_interface:R --> L:server_interface
@@ -38,14 +36,24 @@ architecture-beta
     nginx:T --> B:traccar
     ddclient:L --> R:dns
     fmc920:B --> T:dns
-    ebs:L <-- R:volume
-    volume:L <-- R:traccar
+    ebs:L --> R:volume
+    volume:L --> R:traccar
 ```
+
+#### Notes
+- The pod is managed by
+  [podman-systemd](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html). This
+  provides:
+  - Starting of the pod if the server restarts.
+  - Updates to the pod without server reprovisioning.
+- The EBS volume allows Traccar data to persist with server re provisioning and without an
+  external database service.
+- A static IP is avoided with the use of DDNS, minimising cost.
 
 ## Requirements
 - [Terraform](https://www.terraform.io/).
 - [AWS](https://aws.amazon.com/).
-- [Tailscale](https://tailscale.com/).
+- [Tailscale](https://tailscale.com/) with a tailnet.
 - A [DDNS](https://www.cloudflare.com/learning/dns/glossary/dynamic-dns/) provider e.g.
   [Cloudflare](https://www.cloudflare.com/).
 
@@ -53,9 +61,10 @@ architecture-beta
 
 #### 1. Prepare settings
 
-Copy the Terraform variable template.
+Copy and edit the Terraform variable template.
 ```sh
 cp template.tfvars vars.tfvars
+$EDITOR vars.tfvars
 ```
 Deployment scripts expect the Terraform variables file to be named `vars.tfvars`. Edit the file 
 and enter any required values. Details and instructions for each variable may be found in
@@ -64,11 +73,12 @@ and enter any required values. Details and instructions for each variable may be
 
 #### 2. Prepare TF backend
 
-[Prepare and configure the TF backend](https://developer.hashicorp.com/terraform/language/backend).
+Prepare and configure [the TF backend](https://developer.hashicorp.com/terraform/language/backend).
 A template is provided for an S3 backend:
 
 ```sh
-cp config.s3.tfbackend template.config.s3.tfbackend
+cp template.config.s3.tfbackend config.s3.tfbackend
+$EDITOR config.s3.tfbackend
 ```
 
 If you wish to use an alternative backend, update [the Terraform config](./terraform.tf). Also
