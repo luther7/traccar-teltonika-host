@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+source scripts/utils.bash
+echo "--> Starting taint-server"
+terraform taint aws_instance.traccar_server_instance
+echo "--> Completed taint-server"

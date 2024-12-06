@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "-- Beginning Traccar host setup script"
+echo "-- Beginning Traccar server setup script"
 
 echo "--> Update and upgrade packages"
 apt-get --quiet --yes remove snapd
@@ -26,7 +26,7 @@ sysctl --load=/etc/sysctl.d/99-tailscale.conf
 tailscale \
   up \
   --authkey="${tailscale_authkey}" \
-  --hostname="traccar" \
+  --hostname="${tailscale_hostname}" \
   --ssh=true
 tailscale serve --bg 8082
 
@@ -107,4 +107,4 @@ chown ubuntu:ubuntu --recursive /home/ubuntu/.config/containers/systemd
 systemctl --machine=ubuntu@ --user daemon-reload
 systemctl --machine=ubuntu@ --user start traccar || true
 
-echo "-- Completed Traccar host setup script"
+echo "-- Completed Traccar server setup script"

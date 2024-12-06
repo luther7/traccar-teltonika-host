@@ -2,6 +2,6 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-shellcheck --exclude=SC1091 setup-host.bash
+shellcheck --exclude=SC1091 setup-server.bash
 find scripts -type f -exec shellcheck --exclude=SC1091 {} \;
 shfmt -d .

@@ -1,34 +1,47 @@
-variable "ami" {
-  type    = string
+variable "aws_tags" {
+  type = map(any)
+  default = {
+    Name = "traccar"
+  }
+}
+
+variable "aws_ami" {
+  type = string
+  # Ubuntu 24.04 arm64 ap-southeast-2
   default = "ami-0e86a390303d8b431"
 }
 
-variable "instance_type" {
+variable "aws_instance_type" {
   type    = string
   default = "t4g.nano"
 }
 
-variable "availability_zone" {
+variable "aws_availability_zone" {
   type    = string
   default = "ap-southeast-2a"
 }
 
-variable "root_volume_size" {
+variable "aws_root_volume_size" {
   type    = number
   default = 8
 }
 
-variable "storage_volume_size" {
+variable "aws_storage_volume_size" {
   type    = number
   default = 16
 }
 
-variable "ssh_key_name" {
+variable "aws_ssh_key_name" {
   type = string
 }
 
 variable "tailscale_tags" {
   type = list(string)
+}
+
+variable "tailscale_hostname" {
+  type    = string
+  default = "traccar"
 }
 
 variable "cert_common_name" {

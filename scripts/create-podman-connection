@@ -4,9 +4,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 source scripts/utils.bash
 echo "--> Starting create-podman-connection"
-echo "--> Creating podman connection to traccar host"
+echo "--> Creating podman connection to traccar server"
 # https://github.com/tailscale/tailscale/issues/12409
-traccar_host_ip=$(_ssh curl --silent api.ipify.org)
+traccar_server_ip=$(_ssh curl --silent api.ipify.org)
 podman system connection remove traccar
 # Assumes ssh-agent contains key
 podman \
@@ -14,5 +14,5 @@ podman \
   connection \
   add \
   traccar \
-  "ssh://ubuntu@${traccar_host_ip}/run/user/1000/podman/podman.sock"
+  "ssh://ubuntu@${traccar_server_ip}/run/user/1000/podman/podman.sock"
 echo "--> Completed create-podman-connection"
